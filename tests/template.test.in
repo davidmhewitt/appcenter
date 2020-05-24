@@ -1,0 +1,4 @@
+[Test]
+Exec=behave @TESTS_PATH@ -i @TEST_NAME@ -k
+Type=@TEST_TYPE@
+
