@@ -33,7 +33,38 @@ public class AppCenter.Views.InstalledView : View {
             show_package (package);
         });
 
-        add (app_list_view);
+        var scrolled = new Gtk.ScrolledWindow (null, null);
+        scrolled.add (app_list_view);
+
+        var info_label = new Gtk.Label (_("A restart is required to complete the installation of updates"));
+        info_label.show ();
+
+        var infobar = new Gtk.InfoBar ();
+        infobar.message_type = Gtk.MessageType.WARNING;
+        infobar.no_show_all = true;
+        infobar.get_content_area ().add (info_label);
+
+        var restart_button = infobar.add_button (_("Restart Now"), 0);
+        app_list_view.action_button_group.add_widget (restart_button);
+
+        infobar.response.connect ((response) => {
+            if (response == 0) {
+                try {
+                    SuspendControl.get_default ().reboot ();
+                } catch (GLib.Error e) {
+                    var dialog = new AppCenter.Widgets.RestartDialog ();
+                    dialog.show_all ();
+                }
+            }
+        });
+
+        AppCenterCore.UpdateManager.get_default ().bind_property ("restart-required", infobar, "visible", BindingFlags.SYNC_CREATE);
+
+        var container = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+        container.add (infobar);
+        container.add (scrolled);
+
+        add (container);
 
         unowned AppCenterCore.Client client = AppCenterCore.Client.get_default ();
 

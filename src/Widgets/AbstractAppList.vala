@@ -22,7 +22,7 @@ public abstract class AppCenter.AbstractAppList : Gtk.Box {
 
     protected Gtk.ScrolledWindow scrolled;
     protected Gtk.ListBox list_box;
-    protected Gtk.SizeGroup action_button_group;
+    public Gtk.SizeGroup action_button_group;
     protected Gtk.SizeGroup info_grid_group;
     protected uint packages_changing = 0;
 
