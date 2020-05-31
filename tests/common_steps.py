@@ -64,11 +64,7 @@ class App(object):
             pass
 
     def kill(self):
-        try:
-            os.system("pkill -9 " + self.appCommand)
-        except:
-            # Fall back to killall
-            Popen("killall " + self.appCommand, shell=True).wait()
+        Popen("killall " + self.appCommand, shell=True).wait()
 
     def startViaCommand(self):
         """
@@ -76,6 +72,11 @@ class App(object):
         """
         if self.forceKill and self.isRunning():
             self.kill()
+            for attempt in range(0, 10):
+                if not self.isRunning():
+                    break
+                sleep(1)
+
             assert not self.isRunning(), "Application cannot be stopped"
 
         self.process = Popen(self.appCommand.split() + self.parameters.split())
