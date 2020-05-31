@@ -19,7 +19,7 @@ class App(object):
     """
     def __init__(
         self, appName, shortcut='<Control><Q>', a11yAppName=None,
-            forceKill=False, parameters=''):
+            forceKill=True, parameters=''):
         """
         Initialize object App
         appName     command to run the app
