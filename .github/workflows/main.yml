@@ -9,6 +9,7 @@ jobs:
 
     container:
       image: elementary/docker:unstable
+      # These options add FUSE support to the container which is needed for flatpak testing
       options: --privileged --cap-add SYS_ADMIN --cap-add MKNOD --device /dev/fuse
 
     steps:
@@ -25,6 +26,7 @@ jobs:
     - name: Test
       run: |
         apt install -y flatpak gnome-desktop-testing python3-behave python3-pip python3-cairo python3-pyatspi at-spi2-core libatspi2.0-dev dbus-x11 xvfb appstream-data-pantheon
+        flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
         pip3 install dogtail
         xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" dbus-run-session -- /usr/libexec/io.elementary.appcenter/installed-tests/test-runner.sh "gnome-desktop-testing-runner io.elementary.appcenter"
 
