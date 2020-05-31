@@ -78,7 +78,7 @@ public class AppCenterCore.UbuntuDriversBackend : Backend, Object {
             driver_component.add_icon (icon);
 
             var package = new Package (this, driver_component);
-            if (package.installed) {
+            if (yield is_package_installed (package)) {
                 package.mark_installed ();
                 package.update_state ();
             }

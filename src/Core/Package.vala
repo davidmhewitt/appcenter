@@ -386,7 +386,6 @@ public class AppCenterCore.Package : Object {
         color_primary_text = null;
         payments_key = null;
         suggested_amount = null;
-        _installed = false;
         _author = null;
         _author_title = null;
         backend_details = null;
@@ -401,14 +400,20 @@ public class AppCenterCore.Package : Object {
     }
 
     public void update_state () {
+        State new_state;
+
         if (installed) {
             if (change_information.has_changes ()) {
-                state = State.UPDATE_AVAILABLE;
+                new_state = State.UPDATE_AVAILABLE;
             } else {
-                state = State.INSTALLED;
+                new_state = State.INSTALLED;
             }
         } else {
-            state = State.NOT_INSTALLED;
+            new_state = State.NOT_INSTALLED;
+        }
+
+        if (state != new_state) {
+            state = new_state;
         }
     }
 
