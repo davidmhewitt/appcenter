@@ -64,7 +64,7 @@ class App(object):
             pass
 
     def kill(self):
-        Popen("pkill -9 " + self.appCommand, shell=True).wait()
+        Popen("killall " + self.appCommand, shell=True).wait()
 
     def startViaCommand(self):
         """
