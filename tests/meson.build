@@ -1,4 +1,5 @@
 tests_names = [
+  'flatpak.feature',
   'general.feature',
 ]
 

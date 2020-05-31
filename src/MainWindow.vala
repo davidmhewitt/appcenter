@@ -19,8 +19,10 @@ public class AppCenter.MainWindow : Gtk.ApplicationWindow {
         set {
             if (value) {
                 spinner.start ();
+                spinner.get_accessible ().accessible_description = "AppCenter working";
             } else {
                 spinner.stop ();
+                spinner.get_accessible ().accessible_description = "";
             }
         }
     }

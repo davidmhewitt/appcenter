@@ -22,18 +22,18 @@ def search_is_focused(context, state):
     search = context.app.child(roleName="panel").child(name="Search", roleName="text")
     assert search
     if state == "is":
-        assert search.getState().contains(Atspi.StateType.FOCUSED)
+        assert search.focused
     elif state == "is not":
-        assert search.getState().contains(Atspi.StateType.FOCUSED) == False
+        assert not search.focused
 
 @step('Search {state} editable')
 def search_is_editable(context, state):
     search = context.app.child(roleName="panel").child(name="Search", roleName="text")
     assert search
     if state == "is":
-        assert search.getState().contains(Atspi.StateType.SENSITIVE)
+        assert search.sensitive
     elif state == "is not":
-        assert search.getState().contains(Atspi.StateType.SENSITIVE) == False
+        assert not search.sensitive
 
 @step('Open installed tab')
 def open_installed(context):

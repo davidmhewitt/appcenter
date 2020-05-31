@@ -279,6 +279,12 @@ public class AppCenterCore.PackageKitBackend : Backend, Object {
     }
 
     public async Gee.Collection<AppCenterCore.Package> get_installed_applications (Cancellable? cancellable = null) {
+        foreach (var package in package_list.values) {
+            if (package.state != Package.State.NOT_INSTALLED) {
+                package.clear_installed ();
+            }
+        }
+
         var packages = new Gee.TreeSet<AppCenterCore.Package> ();
         var installed = yield get_installed_packages (cancellable);
         foreach (var pk_package in installed) {

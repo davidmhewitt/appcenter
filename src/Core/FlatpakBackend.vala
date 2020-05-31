@@ -85,8 +85,10 @@ public class AppCenterCore.FlatpakBackend : Backend, Object {
             }
 
             installation_changed_monitor.changed.connect (() => {
-                debug ("Flatpak installation changed.");
-                trigger_update_check.begin ();
+                if (!working) {
+                    debug ("Flatpak installation changed.");
+                    trigger_update_check.begin ();
+                }
             });
         } else {
             warning ("Couldn't create Installation File Monitor due to no installation");
@@ -152,6 +154,12 @@ public class AppCenterCore.FlatpakBackend : Backend, Object {
         } catch (Error e) {
             critical ("Unable to get installed flatpaks: %s", e.message);
             return installed_apps;
+        }
+
+        foreach (var package in package_list.values) {
+            if (package.state != Package.State.NOT_INSTALLED) {
+                package.clear_installed ();
+            }
         }
 
         for (int i = 0; i < installed_refs.length; i++) {

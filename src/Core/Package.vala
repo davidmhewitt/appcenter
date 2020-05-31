@@ -93,24 +93,24 @@ public class AppCenterCore.Package : Object {
         }
     }
 
-    private bool installed_cached;
+    private bool _installed = false;
     public bool installed {
         get {
-            if (installed_cached) {
-                return true;
-            }
-
             if (component.get_id () == OS_UPDATES_ID) {
                 return true;
             }
 
-            installed_cached = backend_reports_installed_sync ();
-            return installed_cached;
+            return _installed;
         }
     }
 
     public void mark_installed () {
-        installed_cached = true;
+        _installed = true;
+        update_state ();
+    }
+
+    public void clear_installed () {
+        _installed = false;
         update_state ();
     }
 
@@ -386,7 +386,7 @@ public class AppCenterCore.Package : Object {
         color_primary_text = null;
         payments_key = null;
         suggested_amount = null;
-        installed_cached = false;
+        _installed = false;
         _author = null;
         _author_title = null;
         backend_details = null;
@@ -446,6 +446,8 @@ public class AppCenterCore.Package : Object {
 
     public async bool uninstall () throws Error {
         // We possibly don't know if this package is installed or not yet, so trigger that check first
+        _installed = yield backend.is_package_installed (this);
+
         update_state ();
 
         if (state == State.INSTALLED || state == State.UPDATE_AVAILABLE) {
@@ -509,11 +511,11 @@ public class AppCenterCore.Package : Object {
                 return success;
             case State.INSTALLING:
                 var success = yield backend.install_package (this, (owned)cb, action_cancellable);
-                installed_cached = success;
+                _installed = success;
                 return success;
             case State.REMOVING:
                 var success = yield backend.remove_package (this, (owned)cb, action_cancellable);
-                installed_cached = !success;
+                _installed = !success;
                 yield client.refresh_updates ();
                 return success;
             default:
@@ -859,24 +861,6 @@ public class AppCenterCore.Package : Object {
         }
 
         return size;
-    }
-
-    private bool backend_reports_installed_sync () {
-        var loop = new MainLoop ();
-        bool result = false;
-        backend.is_package_installed.begin (this, (obj, res) => {
-            try {
-                result = backend.is_package_installed.end (res);
-            } catch (Error e) {
-                warning (e.message);
-                result = false;
-            } finally {
-                loop.quit ();
-            }
-        });
-
-        loop.run ();
-        return result;
     }
 
     private void populate_backend_details_sync () {

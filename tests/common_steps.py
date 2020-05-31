@@ -4,7 +4,7 @@ from time import time, sleep
 from subprocess import Popen, PIPE
 from behave import step
 from unittest import TestCase
-from gi.repository import GLib, Gio
+from gi.repository import GLib, Gio, Atspi
 
 from dogtail.tree import root
 
@@ -97,3 +97,33 @@ class App(object):
 @step(u'Make sure that {app} is running')
 def ensure_app_running(context, app):
     context.app = context.app_class.startViaCommand()
+
+@step(u'Wait for the spinner to stop')
+def wait_spinner_stop(context):
+    spinner = context.app.child(roleName="panel").child(name="Spinner", roleName="animation")
+
+    # Check the spinner is started and wait a few seconds if not
+    started = spinner.description != ""
+    if started == False:
+        for attempt in range (0, 3):
+            started = spinner.description != ""
+            if started == True:
+                break
+            sleep(1)
+
+    assert started == True
+
+    stopped_count = 0
+    for attempt in range (0, 30):
+        stopped = spinner.description == ""
+        if stopped:
+            stopped_count += 1
+        else:
+            stopped_count = 0
+
+        if stopped_count >= 3:
+            break
+
+        sleep(1)
+
+    assert stopped_count >= 3
