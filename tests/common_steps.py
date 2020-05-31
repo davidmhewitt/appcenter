@@ -71,8 +71,8 @@ class App(object):
         Start the app via command
         """
         if self.forceKill and self.isRunning():
-            self.kill()
             for attempt in range(0, 10):
+                self.kill()
                 if not self.isRunning():
                     break
                 sleep(1)
