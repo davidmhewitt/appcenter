@@ -19,8 +19,7 @@
  */
 
 namespace AppCenter.Views {
-/** AppList for the Updates View. Sorts update_available first and shows headers.
-      * Does not show Uninstall Button **/
+
     public class AppListUpdateView : Gtk.ListBox {
         public signal void show_app (AppCenterCore.Package package);
 
@@ -28,6 +27,8 @@ namespace AppCenter.Views {
 
         public Gtk.SizeGroup action_button_group;
         private Gtk.SizeGroup info_grid_group;
+
+        public bool updating_all_apps { get; private set; default = false; }
 
         construct {
             expand = true;
@@ -251,12 +252,25 @@ namespace AppCenter.Views {
                 }
             };
 
+            updating_all_apps = true;
+
             // Collect all ready to update apps
             foreach (var package in get_packages ()) {
                 if (package.update_available && !package.should_nag_update) {
-                   yield package.update ();
+                    package.notify["state"].connect (on_package_update_state);
+                    yield package.update (false);
+                    package.notify["state"].disconnect (on_package_update_state);
                 }
             }
+
+            updating_all_apps = false;
+
+            unowned AppCenterCore.Client client = AppCenterCore.Client.get_default ();
+            yield client.refresh_updates ();
+        }
+
+        private void on_package_update_state () {
+            invalidate_sort ();
         }
     }
 }

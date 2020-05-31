@@ -25,9 +25,6 @@ namespace AppCenter.Widgets {
         public PackageRow.installed (AppCenterCore.Package package, Gtk.SizeGroup? info_size_group, Gtk.SizeGroup? action_size_group) {
             grid = new InstalledPackageRowGrid (package, info_size_group, action_size_group);
             add (grid);
-            grid.changed.connect (() => {
-                changed ();
-            });
         }
 
         public PackageRow.list (AppCenterCore.Package package, Gtk.SizeGroup? action_size_group) {

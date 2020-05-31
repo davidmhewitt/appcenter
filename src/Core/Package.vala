@@ -412,13 +412,18 @@ public class AppCenterCore.Package : Object {
         }
     }
 
-    public async bool update () {
+    public async bool update (bool refresh_updates_after = true) {
         if (state != State.UPDATE_AVAILABLE) {
             return false;
         }
 
         try {
-            return yield perform_operation (State.UPDATING, State.INSTALLED, State.UPDATE_AVAILABLE);
+            var success = yield perform_operation (State.UPDATING, State.INSTALLED, State.UPDATE_AVAILABLE);
+            if (success && refresh_updates_after) {
+                yield Client.get_default ().refresh_updates ();
+            }
+
+            return success;
         } catch (Error e) {
             return false;
         }
@@ -505,7 +510,6 @@ public class AppCenterCore.Package : Object {
                     change_information.clear_update_info ();
                 }
 
-                yield client.refresh_updates ();
                 return success;
             case State.INSTALLING:
                 var success = yield backend.install_package (this, (owned)cb, action_cancellable);

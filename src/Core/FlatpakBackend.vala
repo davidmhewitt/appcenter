@@ -46,6 +46,7 @@ public class AppCenterCore.FlatpakBackend : Backend, Object {
         while (thread_should_run) {
             var job = jobs.pop ();
             working = true;
+
             switch (job.operation) {
                 case Job.Type.REFRESH_CACHE:
                     refresh_cache_internal (job);
@@ -86,7 +87,12 @@ public class AppCenterCore.FlatpakBackend : Backend, Object {
 
             installation_changed_monitor.changed.connect (() => {
                 debug ("Flatpak installation changed.");
-                trigger_update_check.begin ();
+
+                // If the installation changes while we're not busy, something external has changed it
+                // so update our state
+                if (!working) {
+                    trigger_update_check.begin ();
+                }
             });
         } else {
             warning ("Couldn't create Installation File Monitor due to no installation");

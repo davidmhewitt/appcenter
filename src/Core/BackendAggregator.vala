@@ -31,6 +31,8 @@ public class AppCenterCore.BackendAggregator : Backend, Object {
 
         foreach (var backend in backends) {
             backend.notify["working"].connect (() => {
+                notify_property ("working");
+
                 if (working) {
                     if (remove_inhibit_timeout != 0) {
                         Source.remove (remove_inhibit_timeout);
@@ -50,8 +52,6 @@ public class AppCenterCore.BackendAggregator : Backend, Object {
                         });
                     }
                 }
-
-                notify_property ("working");
             });
         }
     }
