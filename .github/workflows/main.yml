@@ -25,6 +25,7 @@ jobs:
       run: |
         apt install -y gnome-desktop-testing python3-behave python3-pip python3-cairo python3-pyatspi at-spi2-core libatspi2.0-dev dbus-x11 xvfb appstream-data-pantheon
         pip3 install dogtail
+        flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
         xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" dbus-run-session -- /usr/libexec/io.elementary.appcenter/installed-tests/test-runner.sh "gnome-desktop-testing-runner io.elementary.appcenter"
 
   lint:
