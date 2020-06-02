@@ -3,7 +3,6 @@ Feature: General
   Background:
     * Make sure that io.elementary.appcenter is running
 
-  @search_focused
   Scenario: Search should be focused and editable at the correct times
     # Immediately after opening AppCenter
     Then Search is focused
@@ -27,7 +26,6 @@ Feature: General
     * Press back
     Then Search is editable
 
-  @quit_via_shortcut
   Scenario: Quit AppCenter via shortcut
     * Quit AppCenter
     Then AppCenter is not running

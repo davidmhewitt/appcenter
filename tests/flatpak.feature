@@ -1,5 +1,4 @@
 Feature: Flatpak
-  @search_focused
   Scenario: External changes to flatpak installations should cause appcenter to update
     * Make sure that io.elementary.appcenter is running
     * Wait for the spinner to stop

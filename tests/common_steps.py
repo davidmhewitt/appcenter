@@ -57,7 +57,14 @@ class App(object):
         Quit the app via 'Ctrl+Q'
         """
         try:
+            if not self.isRunning():
+                return
             keyCombo(self.shortcut)
+            for attempt in range(0, 10):
+                sleep(1)
+                if not self.isRunning():
+                    break
+
             if self.isRunning():
                 self.kill()
         except:

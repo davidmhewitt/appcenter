@@ -28,3 +28,5 @@ def before_all(context):
     except Exception as e:
         print("Error in before_all: %s" % e.message)
 
+def after_scenario(context, scenario):
+    context.app_class.quit()
