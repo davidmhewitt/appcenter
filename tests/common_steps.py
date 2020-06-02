@@ -83,6 +83,9 @@ class App(object):
         self.pid = self.process.pid
 
         assert self.isRunning(), "Application failed to start"
+
+        # Wait a second for the window to be ready
+        sleep(1)
         return root.application(self.a11yAppName)
 
     def closeViaShortcut(self):
