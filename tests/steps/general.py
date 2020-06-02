@@ -21,6 +21,7 @@ def quit_appcenter(context):
 def search_is_focused(context, state):
     search = context.app.child(roleName="panel").child(name="Search", roleName="text")
     assert search
+    context.app.dump()
     if state == "is":
         assert search.focused
     elif state == "is not":
