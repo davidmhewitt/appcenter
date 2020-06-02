@@ -19,7 +19,7 @@ class App(object):
     """
     def __init__(
         self, appName, shortcut='<Control><Q>', a11yAppName=None,
-            forceKill=True, parameters=''):
+            forceKill=False, parameters=''):
         """
         Initialize object App
         appName     command to run the app
@@ -86,8 +86,9 @@ class App(object):
 
             assert not self.isRunning(), "Application cannot be stopped"
 
-        self.process = Popen(self.appCommand.split() + self.parameters.split())
-        self.pid = self.process.pid
+        if not self.isRunning():
+            self.process = Popen(self.appCommand.split() + self.parameters.split())
+            self.pid = self.process.pid
 
         assert self.isRunning(), "Application failed to start"
 
@@ -108,6 +109,30 @@ class App(object):
 @step(u'Make sure that {app} is running')
 def ensure_app_running(context, app):
     context.app = context.app_class.startViaCommand()
+
+@step(u'Click "{name}" button')
+def click_button(context, name):
+    button = context.app.child(name=name, roleName="push button")
+    button.click()
+
+@step(u'Click "{name}" check box')
+def click_check(context, name):
+    check = context.app.child(name=name, roleName="check box")
+    check.click()
+
+@step(u'Non-curated dialog {state} open')
+def curated_dialog_open(context, state):
+    dialog = None
+
+    try:
+        dialog = context.app.child(name="Non-Curated Warning", roleName="dialog")
+    except:
+        pass
+
+    if state == "is":
+        assert dialog
+    else:
+        assert not dialog
 
 @step(u'Wait for the spinner to stop')
 def wait_spinner_stop(context):
@@ -138,3 +163,17 @@ def wait_spinner_stop(context):
         sleep(1)
 
     assert stopped_count >= 3
+
+@step('"{name}" button {state} visible')
+def button_is_visible(context, name, state):
+    button = None
+
+    try:
+        button = context.app.child(name=name, roleName="push button")
+    except:
+        pass
+
+    if state == "is":
+        assert button and button.showing
+    elif state == "is not":
+        assert not button or not button.showing

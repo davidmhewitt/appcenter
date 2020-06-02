@@ -1,4 +1,5 @@
 from time import sleep, localtime, strftime
+from subprocess import Popen
 from dogtail.utils import isA11yEnabled, enableA11y
 if not isA11yEnabled():
     enableA11y(True)
@@ -28,5 +29,8 @@ def before_all(context):
     except Exception as e:
         print("Error in before_all: %s" % e.message)
 
-def after_scenario(context, scenario):
+def before_feature(context, feature):
+    Popen ("gsettings reset-recursively io.elementary.appcenter.settings", shell=True).wait()
+
+def after_feature(context, feature):
     context.app_class.quit()
