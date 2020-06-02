@@ -412,18 +412,34 @@ public class AppCenterCore.Package : Object {
             new_state = State.NOT_INSTALLED;
         }
 
+        // Only trigger a notify if the state has changed, quite a lot of things listen to this
         if (state != new_state) {
             state = new_state;
         }
     }
 
-    public async bool update () {
+    /**
+     * Instructs the backend to update this package
+     *
+     * @refresh_updates_after: Whether to run the check for updates (and update the badges etc...) after
+     * this method succeeds. This is fine after updating a single package, but for efficiency, it's better to
+     * do this only once at the end of updating a batch of packages, so this should be set to false if updating
+     * multiple packages in a loop.
+     *
+     */
+    public async bool update (bool refresh_updates_after = true) {
         if (state != State.UPDATE_AVAILABLE) {
             return false;
         }
 
         try {
-            return yield perform_operation (State.UPDATING, State.INSTALLED, State.UPDATE_AVAILABLE);
+            var success = yield perform_operation (State.UPDATING, State.INSTALLED, State.UPDATE_AVAILABLE);
+            if (success && refresh_updates_after) {
+                unowned Client client = Client.get_default ();
+                yield client.refresh_updates ();
+            }
+
+            return success;
         } catch (Error e) {
             return false;
         }
@@ -510,17 +526,19 @@ public class AppCenterCore.Package : Object {
                 var success = yield backend.update_package (this, (owned)cb, action_cancellable);
                 if (success) {
                     change_information.clear_update_info ();
+                    update_state ();
                 }
 
-                yield client.refresh_updates ();
                 return success;
             case State.INSTALLING:
                 var success = yield backend.install_package (this, (owned)cb, action_cancellable);
                 _installed = success;
+                update_state ();
                 return success;
             case State.REMOVING:
                 var success = yield backend.remove_package (this, (owned)cb, action_cancellable);
                 _installed = !success;
+                update_state ();
                 yield client.refresh_updates ();
                 return success;
             default:
