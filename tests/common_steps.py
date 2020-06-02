@@ -92,8 +92,8 @@ class App(object):
 
         assert self.isRunning(), "Application failed to start"
 
-        # Wait a second for the window to be ready
-        sleep(1)
+        # Wait a bit for the window to be ready
+        sleep(5)
         return root.application(self.a11yAppName)
 
     def closeViaShortcut(self):
