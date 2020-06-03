@@ -94,6 +94,10 @@ class App(object):
 @step(u'Make sure that {app} is running')
 def ensure_app_running(context, app):
     context.app = context.app_class.startViaCommand()
+    for attempt in range(0, 20):
+        if context.app.child(roleName="push button", name="Close").showing:
+            break;
+        sleep(0.5)
 
 @step(u'Click "{name}" button')
 def click_button(context, name):
