@@ -7,6 +7,7 @@ from unittest import TestCase
 from gi.repository import GLib, Gio, Atspi
 
 from dogtail.tree import root
+from dogtail.rawinput import typeText, pressKey, keyCombo
 
 # Create a dummy unittest class to have nice assertions
 class dummy(TestCase):
@@ -56,19 +57,16 @@ class App(object):
         """
         Quit the app via 'Ctrl+Q'
         """
-        try:
+        if not self.isRunning():
+            return
+        keyCombo(self.shortcut)
+        for attempt in range(0, 10):
+            sleep(1)
             if not self.isRunning():
-                return
-            keyCombo(self.shortcut)
-            for attempt in range(0, 10):
-                sleep(1)
-                if not self.isRunning():
-                    break
+                break
 
-            if self.isRunning():
-                self.kill()
-        except:
-            pass
+        if self.isRunning():
+            self.kill()
 
     def kill(self):
         Popen("killall " + self.appCommand, shell=True).wait()
@@ -91,20 +89,7 @@ class App(object):
             self.pid = self.process.pid
 
         assert self.isRunning(), "Application failed to start"
-
-        # Wait a bit for the window to be ready
-        sleep(5)
         return root.application(self.a11yAppName)
-
-    def closeViaShortcut(self):
-        """
-        Close the app via shortcut
-        """
-        if not self.isRunning():
-            raise Exception("App is not running")
-
-        keyCombo(self.shortcut)
-        assert not self.isRunning(), "Application cannot be stopped"
 
 @step(u'Make sure that {app} is running')
 def ensure_app_running(context, app):
